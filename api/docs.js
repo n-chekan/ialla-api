@@ -1,5 +1,3 @@
-// @ts-ignore - @vercel/node types not available
-import { VercelRequest, VercelResponse } from '@vercel/node';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -7,7 +5,7 @@ import { join } from 'path';
  * API Documentation Endpoint
  * GET /api/docs
  */
-export default async (req: VercelRequest, res: VercelResponse) => {
+export default async (req, res) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     res.status(200).end();
