@@ -50,7 +50,7 @@ class CacheService {
    * Delete cached data by key
    */
   del(key: string): boolean {
-    return this.cache.del(key);
+    return this.cache.del(key) > 0;
   }
 
   /**
@@ -148,7 +148,7 @@ class CacheService {
    * Get TTL for a key
    */
   getTTL(key: string): number {
-    return this.cache.getTtl(key);
+    return this.cache.getTtl(key) || 0;
   }
 
   /**
