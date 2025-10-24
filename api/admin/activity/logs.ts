@@ -1,9 +1,9 @@
 // @ts-ignore - @vercel/node types not available
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { authMiddleware } from '../../src/middleware/auth.js';
+import { authMiddleware } from '../../src/middleware/auth';
 import { createClient } from '@supabase/supabase-js';
-import { ValidationError, asyncHandler } from '../../src/utils/errors.js';
+import { ValidationError, asyncHandler } from '../../src/utils/errors';
 
 const AdminActivityLogsQuerySchema = z.object({
   limit: z.string().optional().transform(val => val ? parseInt(val) : 50),
