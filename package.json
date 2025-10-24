@@ -1,0 +1,46 @@
+{
+  "name": "ialla-api",
+  "version": "1.0.0",
+  "description": "API middlelayer for Ialla language learning platform",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts",
+    "test": "echo \"Tests not implemented yet\""
+  },
+  "dependencies": {
+    "@vercel/node": "^3.0.0",
+    "@supabase/supabase-js": "^2.56.1",
+    "zod": "^3.22.0",
+    "node-cache": "^5.1.2",
+    "openai": "^4.0.0",
+    "resend": "^2.0.0",
+    "posthog-node": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vercel": "^32.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "api",
+    "middlelayer",
+    "ialla",
+    "language-learning",
+    "openai",
+    "elevenlabs",
+    "resend"
+  ],
+  "author": "Ialla Team",
+  "license": "MIT"
+}

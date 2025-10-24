@@ -1,0 +1,668 @@
+openapi: 3.0.3
+info:
+  title: Ialla API Middlelayer
+  description: API middlelayer for Ialla language learning platform
+  version: 1.0.0
+  contact:
+    name: Ialla API Support
+    email: support@ialla.app
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.ialla.app
+    description: Production server
+  - url: https://api-staging.ialla.app
+    description: Staging server
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
+
+paths:
+  /api/openai/analyze:
+    post:
+      summary: Analyze conversation using OpenAI
+      description: Analyze a conversation for language learning insights
+      operationId: analyzeConversation
+      tags:
+        - OpenAI
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationAnalysisRequest'
+            examples:
+              basic_analysis:
+                summary: Basic conversation analysis
+                value:
+                  messages:
+                    - role: "user"
+                      content: "Hello, I want to learn Spanish"
+                    - role: "assistant"
+                      content: "¡Hola! I'd be happy to help you learn Spanish. What would you like to focus on first?"
+                  userProfile:
+                    native_language: "English"
+                    practice_languages: ["Spanish"]
+                    level: "Beginner"
+                    interface_language: "en"
+              vocabulary_practice:
+                summary: Vocabulary practice analysis
+                value:
+                  messages:
+                    - role: "user"
+                      content: "I practiced these words: casa, perro, gato"
+                    - role: "assistant"
+                      content: "Great! Let's practice using those words in sentences."
+                  userProfile:
+                    native_language: "English"
+                    practice_languages: ["Spanish"]
+                    level: "Beginner"
+                    interface_language: "en"
+                  vocabularyContext:
+                    word_list_title: "Basic Spanish Words"
+                    word_list_topic: "Animals and Home"
+                    word_list_words:
+                      - word: "casa"
+                        translation: "house"
+                      - word: "perro"
+                        translation: "dog"
+                      - word: "gato"
+                        translation: "cat"
+      responses:
+        '200':
+          description: Analysis completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationAnalysisResponse'
+              examples:
+                success:
+                  summary: Successful analysis
+                  value:
+                    success: true
+                    data:
+                      summary: "The student is practicing basic Spanish vocabulary including animals and home-related words. They show good engagement and are ready for sentence construction practice."
+                      keyTopics: ["Spanish vocabulary", "Animals", "Home", "Basic conversation"]
+                      userInsights:
+                        languageLevel: "Beginner"
+                        commonMistakes: []
+                        interests: ["Animals", "Home vocabulary"]
+                        learningStyle: "Practical"
+                        strengths: ["Good pronunciation", "Active participation"]
+                        areasForImprovement: ["Sentence structure", "Grammar rules"]
+                      conversationType: "vocabulary_practice"
+                      learningProgress:
+                        vocabularyProgress: "Good - 3 new words learned"
+                        grammarProgress: "Needs improvement"
+                        fluencyProgress: "Developing"
+                    timestamp: "2024-01-15T10:30:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/elevenlabs/conversation:
+    post:
+      summary: Manage ElevenLabs conversation
+      description: Start, send messages to, or end a voice conversation
+      operationId: manageConversation
+      tags:
+        - ElevenLabs
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationRequest'
+            examples:
+              start_conversation:
+                summary: Start a new conversation
+                value:
+                  action: "start_conversation"
+                  agentId: "agent_123"
+                  config:
+                    language: "Spanish"
+                    level: "Beginner"
+              send_message:
+                summary: Send message to conversation
+                value:
+                  action: "send_message"
+                  conversationId: "conv_456"
+                  message: "Hello, how are you today?"
+              end_conversation:
+                summary: End conversation
+                value:
+                  action: "end_conversation"
+                  conversationId: "conv_456"
+      responses:
+        '200':
+          description: Conversation operation completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/elevenlabs/voice:
+    post:
+      summary: Generate voice using ElevenLabs
+      description: Convert text to speech using ElevenLabs voice synthesis
+      operationId: generateVoice
+      tags:
+        - ElevenLabs
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoiceRequest'
+            examples:
+              basic_voice:
+                summary: Basic voice generation
+                value:
+                  text: "Hello, welcome to iAlla language learning!"
+                  voiceId: "voice_123"
+              custom_settings:
+                summary: Voice with custom settings
+                value:
+                  text: "Let's practice Spanish pronunciation"
+                  voiceId: "voice_456"
+                  settings:
+                    stability: 0.7
+                    similarity_boost: 0.8
+                    style: 0.5
+      responses:
+        '200':
+          description: Voice generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoiceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/resend/send:
+    post:
+      summary: Send email via Resend
+      description: Send transactional emails using Resend service
+      operationId: sendEmail
+      tags:
+        - Resend
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+            examples:
+              student_invitation:
+                summary: Student invitation email
+                value:
+                  emailType: "student_invitation"
+                  to: "student@example.com"
+                  data:
+                    studentName: "John Doe"
+                    teacherName: "Maria Garcia"
+                    invitationLink: "https://ialla.app/invite/abc123"
+                    language: "Spanish"
+              teacher_invitation:
+                summary: Teacher invitation email
+                value:
+                  emailType: "teacher_invitation"
+                  to: "teacher@example.com"
+                  data:
+                    teacherName: "Maria Garcia"
+                    studentName: "John Doe"
+                    invitationLink: "https://ialla.app/invite/def456"
+                    language: "Spanish"
+              contact:
+                summary: Contact form email
+                value:
+                  emailType: "contact"
+                  to: "support@ialla.app"
+                  data:
+                    name: "John Doe"
+                    email: "john@example.com"
+                    message: "I have a question about the premium features"
+                    subject: "Question about premium features"
+              welcome:
+                summary: Welcome email
+                value:
+                  emailType: "welcome"
+                  to: "newuser@example.com"
+                  data:
+                    userName: "John Doe"
+                    language: "Spanish"
+                    dashboardLink: "https://ialla.app/dashboard"
+      responses:
+        '200':
+          description: Email sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token from Supabase authentication
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for system/webhook authentication
+
+  schemas:
+    ConversationAnalysisRequest:
+      type: object
+      required:
+        - messages
+        - userProfile
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+          minItems: 1
+          description: Array of conversation messages
+        userProfile:
+          $ref: '#/components/schemas/UserProfile'
+        studyTopic:
+          $ref: '#/components/schemas/StudyTopic'
+        vocabularyContext:
+          $ref: '#/components/schemas/VocabularyContext'
+
+    ConversationAnalysisResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/ConversationAnalysis'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    ConversationAnalysis:
+      type: object
+      properties:
+        summary:
+          type: string
+          description: Summary of the conversation
+          example: "The student is practicing basic Spanish vocabulary including animals and home-related words."
+        keyTopics:
+          type: array
+          items:
+            type: string
+          description: Key topics discussed
+          example: ["Spanish vocabulary", "Animals", "Home"]
+        userInsights:
+          $ref: '#/components/schemas/UserInsights'
+        conversationType:
+          type: string
+          enum: [study_plan, general, practice, vocabulary_practice]
+          example: "vocabulary_practice"
+        learningProgress:
+          $ref: '#/components/schemas/LearningProgress'
+
+    UserInsights:
+      type: object
+      properties:
+        languageLevel:
+          type: string
+          example: "Beginner"
+        commonMistakes:
+          type: array
+          items:
+            type: string
+          example: []
+        interests:
+          type: array
+          items:
+            type: string
+          example: ["Animals", "Home vocabulary"]
+        learningStyle:
+          type: string
+          example: "Practical"
+        strengths:
+          type: array
+          items:
+            type: string
+          example: ["Good pronunciation", "Active participation"]
+        areasForImprovement:
+          type: array
+          items:
+            type: string
+          example: ["Sentence structure", "Grammar rules"]
+
+    LearningProgress:
+      type: object
+      properties:
+        vocabularyProgress:
+          type: string
+          example: "Good - 3 new words learned"
+        grammarProgress:
+          type: string
+          example: "Needs improvement"
+        fluencyProgress:
+          type: string
+          example: "Developing"
+
+    Message:
+      type: object
+      required:
+        - role
+        - content
+      properties:
+        role:
+          type: string
+          enum: [user, assistant, system]
+          example: "user"
+        content:
+          type: string
+          example: "Hello, I want to learn Spanish"
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    UserProfile:
+      type: object
+      properties:
+        native_language:
+          type: string
+          example: "English"
+        practice_languages:
+          type: array
+          items:
+            type: string
+          example: ["Spanish"]
+        level:
+          type: string
+          example: "Beginner"
+        learning_goals:
+          type: string
+          example: "Conversational fluency"
+        first_name:
+          type: string
+          example: "John"
+        interface_language:
+          type: string
+          example: "en"
+
+    StudyTopic:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: "Spanish Animals"
+        description:
+          type: string
+          example: "Learning vocabulary for common animals in Spanish"
+
+    VocabularyContext:
+      type: object
+      required:
+        - word_list_title
+        - word_list_topic
+        - word_list_words
+      properties:
+        word_list_title:
+          type: string
+          example: "Basic Spanish Words"
+        word_list_topic:
+          type: string
+          example: "Animals and Home"
+        word_list_words:
+          type: array
+          items:
+            type: object
+            properties:
+              word:
+                type: string
+                example: "casa"
+              translation:
+                type: string
+                example: "house"
+
+    ConversationRequest:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum: [start_conversation, send_message, end_conversation]
+          example: "start_conversation"
+        agentId:
+          type: string
+          example: "agent_123"
+        message:
+          type: string
+          example: "Hello, how are you today?"
+        conversationId:
+          type: string
+          example: "conv_456"
+        config:
+          type: object
+          additionalProperties: true
+
+    ConversationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          additionalProperties: true
+        action:
+          type: string
+          example: "start_conversation"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    VoiceRequest:
+      type: object
+      required:
+        - text
+        - voiceId
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 5000
+          example: "Hello, welcome to iAlla language learning!"
+        voiceId:
+          type: string
+          example: "voice_123"
+        settings:
+          type: object
+          properties:
+            stability:
+              type: number
+              minimum: 0
+              maximum: 1
+              example: 0.7
+            similarity_boost:
+              type: number
+              minimum: 0
+              maximum: 1
+              example: 0.8
+            style:
+              type: number
+              minimum: 0
+              maximum: 1
+              example: 0.5
+            use_speaker_boost:
+              type: boolean
+              example: true
+
+    VoiceResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            audioUrl:
+              type: string
+              format: uri
+              example: "https://api.elevenlabs.io/v1/text-to-speech/voice_123/generated_1234567890.mp3"
+            duration:
+              type: number
+              example: 3.5
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    EmailRequest:
+      type: object
+      required:
+        - emailType
+        - to
+        - data
+      properties:
+        emailType:
+          type: string
+          enum: [student_invitation, teacher_invitation, contact, welcome]
+          example: "student_invitation"
+        to:
+          type: string
+          format: email
+          example: "student@example.com"
+        data:
+          type: object
+          additionalProperties: true
+          description: Template-specific data
+
+    EmailResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: "re_1234567890"
+            status:
+              type: string
+              example: "sent"
+        message:
+          type: string
+          example: "Email sent successfully"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Validation Error"
+        message:
+          type: string
+          example: "Invalid request data"
+        code:
+          type: string
+          example: "VALIDATION_ERROR"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Validation Error"
+            message: "Invalid request data"
+            code: "VALIDATION_ERROR"
+            timestamp: "2024-01-15T10:30:00Z"
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Authentication Error"
+            message: "Authentication required"
+            code: "AUTHENTICATION_ERROR"
+            timestamp: "2024-01-15T10:30:00Z"
+
+    TooManyRequests:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Rate Limit Exceeded"
+            message: "Rate limit exceeded"
+            code: "RATE_LIMIT_EXCEEDED"
+            timestamp: "2024-01-15T10:30:00Z"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Internal Server Error"
+            message: "An unexpected error occurred"
+            code: "INTERNAL_SERVER_ERROR"
+            timestamp: "2024-01-15T10:30:00Z"
